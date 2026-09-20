@@ -1,0 +1,65 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# ESTADO DEL ONBOARDING — lo lee el agente al abrir sesión, antes de saludar
+# ══════════════════════════════════════════════════════════════════════════════
+# Sin este archivo no hay onboarding: hay una explicación que se repite o que no llega.
+# El agente que abre sesión mañana puede ser otro modelo, en otra herramienta, sin nada
+# de la conversación de hoy. Esto es lo único que sabrá.
+#
+# Lo mantiene el agente. La persona no lo abre nunca.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── DE DÓNDE VIENE, que cambia el recorrido entero ───────────────────────────
+# Se pregunta UNA vez, en la primera pantalla, y no se vuelve a preguntar.
+#   nuevo      · empieza de cero. El recorrido normal.
+#   migracion  · TRAE material (carpetas con años de cosas, notas en tres sitios).
+#                Necesita una fase más antes del mapa: decidir qué de lo suyo entra.
+#
+# ⚠️ Es la diferencia entre un cliente que agradece el método y uno que se siente
+# estafado. Quien trae 500 archivos y espera un botón de importar recibe una criba —
+# y si no se le dijo antes, la criba parece una excusa.
+modo: ''
+
+fase_actual: 0
+completadas: []
+
+# Qué proyecto declaró la persona en la fase 0.
+# ⚠️ NO ES DECORATIVO: todos los ejemplos del onboarding se construyen sobre esto.
+#    Explicar los dominios con un negocio ajeno enseña ese negocio, no el método.
+proyecto_declarado: ''
+
+# Lo que vio el doctor en la fase 0. Se guarda porque el agente de mañana no estuvo
+# aquí, y volver a ejecutarlo no le dice si YA se avisó de algo.
+# #   avisado_de: lo que ya se le ha dicho — para no repetirlo en cada sesión
+ordenador:
+  revisado: false
+  avisado_de: []
+
+fecha_inicio: ''
+ultima_sesion: ''
+
+# Lo que ha creado. Es el criterio de graduación, no una estadística.
+creado_hasta_ahora:
+  agentes: []
+  skills: []
+  tareas: 0
+  sesiones_cerradas: 0
+  herramientas: []
+
+# Lo que le costó, con sus palabras si es posible. Para el agente que venga después.
+# Si alguien se atasca dos sesiones en la misma fase, el problema es del ejemplo que se
+# está usando, no de la persona: anótalo aquí y cámbialo.
+notas_del_agente: ''
+
+# ── Referencia de las ocho fases (0–7) ────────────────────────────────────────
+# 0  Esto no es una app · declara su proyecto
+# 1  El mapa · sabe dónde iría una cosa suya
+# 2  Pedir bien · tiene su primera tarea
+# 3  Los candados · ha visto saltar uno
+# 4  Su primer agente · lo tiene funcionando
+# 5  Su primera skill · la ha usado una vez
+# 6  Cerrar sin perder nada · ha cerrado una sesión entera
+# 7  Cambiar de sala · ha trabajado desde dos herramientas
+#
+# GRADUACIÓN: un agente · una skill · una sesión cerrada · dos herramientas.
+# Las cuatro son de la base. Lo que traiga un programa de `modulos/` no cuenta aquí.
+# Con todas, el onboarding se cierra y NO se vuelve a mencionar.

@@ -1,0 +1,23 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+# 06-sep-2026 · Decía solo `exos/scripts/logs/` y el gancho escribe en
+# `exos/logs/`. Resultado: al primer usuario real se le versionó
+# `saltos-guardian.log` — un registro de ejecución, sin nada dentro que importe,
+# pero que no pinta nada en su historial. Las dos rutas, por si alguna cambia.
+exos/logs/
+exos/scripts/logs/
+**/feedback/.offset.json
+__pycache__/
+
+# Secretos y su mapa: NUNCA a git. Los archivos siguen en disco.
+# 15-ago-2026: sin esta línea, el primer `git commit` de la entrega quedaba bloqueado
+# por el guardián de archivos —que hace bien su trabajo— señalando el `_secrets/.gitkeep`
+# que el propio producto crea. Un sistema que se bloquea a sí mismo en el paso uno enseña
+# a usar `--no-verify` antes de haber enseñado nada más.
+_secrets/
+
+# Cookies de sesión: son credenciales con otro nombre. Un `git add .` las sube sin
+# preguntar. Los archivos siguen en disco.
+*cookies.txt

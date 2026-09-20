@@ -1,0 +1,2 @@
+Marcador de la raiz del vault. Lo busca exos/scripts/_raiz.py subiendo carpetas.
+No lo borres: sin el, los generadores no saben donde estan.

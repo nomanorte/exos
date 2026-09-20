@@ -1,0 +1,107 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# PERFILES DE ACCESO — quién puede tocar qué. Fuente única, versionada.
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# QUÉ ES: la declaración legible por máquina de a qué accede cada agente. Se escribe UNA
+# vez aquí, y un traductor la lleva a cada programa que uses:
+#
+#     python3 exos/scripts/aplicar_perfiles.py --herramienta opencode --aplicar
+#
+# Así los permisos no dependen del programa. Cambias de herramienta y encuentras lo mismo.
+#
+# ── LA FORMA DEL PERÍMETRO (idéntica para todos, cambia una variable) ─────────
+#   1. NÚCLEO  — la doctrina y las skills. Lo leen todos, no lo escribe nadie.
+#   2. DOMINIO — su territorio. Lee y escribe.
+#   3. COMÚN   — tareas y sesiones, donde todos cierran. Escribe.
+#   4. NIEGA   — territorios ajenos, secretos, datos personales.
+#
+# ⚠️ ESTOS PERMISOS SON ENFOQUE, NO SEGURIDAD. Evitan que un agente hurgue donde no le
+# toca y trabaje peor. NO son una barrera dura: la terminal se salta cualquier lista.
+# La seguridad real es que tus claves no vivan en archivos y que publicar exija un paso
+# manual tuyo.
+# ══════════════════════════════════════════════════════════════════════════════
+
+meta:
+  version: 1
+  actualizado: '2026-09-20'
+
+# ⚠️ NO TOCAR salvo que muevas la carpeta raíz. EXOS público contiene un solo repositorio.
+repos:
+  vault: .
+
+# ── NÚCLEO — lo que leen todos ───────────────────────────────────────────────
+nucleo_lee:
+  - AGENTS.md
+  - CLAUDE.md
+  - mi-vida/hot.md
+  - exos/ESTANDARES.md
+  - exos/agentes/
+
+# ── COMÚN — donde todos cierran su sesión ────────────────────────────────────
+comun_escribe:
+  - mi-vida/tareas/
+  - mi-vida/sesiones/
+  - mi-vida/hot.md
+
+# ── NIEGA — para todos, sin excepción salvo la que se declare ────────────────
+niega_todos:
+  - _secrets/
+  - .env
+  - .env.local
+
+# Comandos que nadie ejecuta sin que tú los veas.
+niega_comandos:
+  - rm
+  - sudo
+  - curl
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TRES AGENTES DE EJEMPLO
+# ══════════════════════════════════════════════════════════════════════════════
+# Uno mantiene el sistema y los otros dos ilustran dominios acotados.
+#
+# ⇒ Lo que enseña el contraste: **una frontera se justifica o no se pone.** Si un agente
+#   tiene un perímetro ancho, el motivo va escrito. Si no sabes por qué se lo das, sobra.
+#
+# Renómbralos. Bórralos. Crea los tuyos. Están aquí para que veas la forma, no para que
+# los uses tal cual.
+
+agentes:
+
+  # ── ANCHO · y aquí está su excepción, declarada ────────────────────────────
+  sistema:
+    proyecto: Sistema
+    dominio: _Meta
+    repos: [vault]
+    escribe:
+      - exos/scripts/     # ⚠️ EXCEPCIÓN: toca lo que gobierna a los demás agentes.
+      - exos/agentes/           #    Se la damos porque es quien mantiene el sistema; y por
+                             #    eso mismo su terminal PREGUNTA siempre.
+    terminal: preguntar
+    nota: >-
+      Es el que más escribe, así que la tentación es darle terminal automática. No:
+      escritura ancha + terminal ancha + sin preguntar es la peor combinación posible.
+
+  negocio:
+    proyecto: Negocio
+    dominio: negocio
+    repos: [vault]
+    escribe:
+      - mi-vida/            # sus cajones. Nada más.
+    lee_extra:
+      - mi-vida/            # lee lo suyo; no lo reorganiza
+    terminal: preguntar
+
+  # ── ACOTADO · y fíjate en la asimetría lee/escribe ─────────────────────────
+  media:
+    proyecto: Media
+    dominio: marca
+    repos: [vault]
+    escribe:
+      - mi-vida/
+    lee_extra:
+      - mi-vida/            # usa lo que haya; no lo reorganiza
+    terminal: preguntar
+    nota: >-
+      Leer y escribir no son la misma frontera. Este lee la biblioteca porque necesita el
+      material, y no la escribe porque no es quien decide qué entra en ella.

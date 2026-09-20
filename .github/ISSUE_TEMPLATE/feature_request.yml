@@ -1,0 +1,19 @@
+name: Propuesta de mejora
+description: Sugiere una mejora del núcleo público de EXOS.
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: Problema que quieres resolver
+    validations:
+      required: true
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: Solución que propones
+    validations:
+      required: true
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas o límites conocidos

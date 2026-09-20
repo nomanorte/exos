@@ -1,0 +1,254 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El mapa del sistema</title>
+<style>
+
+  :root{
+    --ground:#fbfaf7; --ink:#1a1b21; --ink-2:#4a4c57; --ink-3:#7c7f8c;
+    --rule:#e2e0d9; --card:#ffffff; --card-2:#f4f2ec;
+    --motor:#a8741a; --motor-bg:#f6eeda;
+    --terr:#4a7a5c;  --terr-bg:#e6efe8;
+    --oper:#a04f3d;  --oper-bg:#f7e8e3;
+    --surf:#3f6285;  --surf-bg:#e4ecf4;
+    --off:#8a8d99;   --off-bg:#eeeeec;
+    --shadow:0 1px 2px rgba(26,27,33,.06),0 4px 16px rgba(26,27,33,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#131418; --ink:#eceaE4; --ink-2:#b0b2bc; --ink-3:#7e808c;
+      --rule:#2a2c34; --card:#1b1d22; --card-2:#212329;
+      --motor:#d9a54a; --motor-bg:#2e2718;
+      --terr:#7fb894;  --terr-bg:#1a2620;
+      --oper:#d98a72;  --oper-bg:#2c1e1a;
+      --surf:#7ba3cc;  --surf-bg:#182430;
+      --off:#8a8d99;   --off-bg:#212228;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 18px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#131418; --ink:#eceae4; --ink-2:#b0b2bc; --ink-3:#7e808c;
+    --rule:#2a2c34; --card:#1b1d22; --card-2:#212329;
+    --motor:#d9a54a; --motor-bg:#2e2718;
+    --terr:#7fb894;  --terr-bg:#1a2620;
+    --oper:#d98a72;  --oper-bg:#2c1e1a;
+    --surf:#7ba3cc;  --surf-bg:#182430;
+    --off:#8a8d99;   --off-bg:#212228;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 18px rgba(0,0,0,.3);
+  }
+  :root[data-theme="light"]{
+    --ground:#fbfaf7; --ink:#1a1b21; --ink-2:#4a4c57; --ink-3:#7c7f8c;
+    --rule:#e2e0d9; --card:#ffffff; --card-2:#f4f2ec;
+    --motor:#a8741a; --motor-bg:#f6eeda;
+    --terr:#4a7a5c;  --terr-bg:#e6efe8;
+    --oper:#a04f3d;  --oper-bg:#f7e8e3;
+    --surf:#3f6285;  --surf-bg:#e4ecf4;
+    --off:#8a8d99;   --off-bg:#eeeeec;
+    --shadow:0 1px 2px rgba(26,27,33,.06),0 4px 16px rgba(26,27,33,.05);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
+    font-size:17px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:56px 24px 96px}
+  h1,h2,h3,.ui{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+  header{margin-bottom:44px}
+  .eyebrow{
+    font-family:system-ui,sans-serif; font-size:12px; font-weight:650;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin:0 0 14px;
+  }
+  h1{
+    font-size:clamp(30px,5.2vw,44px); line-height:1.08; letter-spacing:-.028em;
+    font-weight:760; margin:0 0 16px; text-wrap:balance;
+  }
+  .lede{font-size:19px; color:var(--ink-2); margin:0; max-width:62ch}
+  .lede strong{color:var(--ink); font-weight:600}
+
+  .figure{
+    margin:40px 0 12px; padding:26px 20px; background:var(--card);
+    border:1px solid var(--rule); border-radius:10px; box-shadow:var(--shadow);
+    overflow-x:auto;
+  }
+  .figure svg{display:block; margin:0 auto; min-width:600px}
+  .figcap{
+    font-family:system-ui,sans-serif; font-size:13.5px; color:var(--ink-3);
+    text-align:center; margin:0 0 44px; padding:0 12px;
+  }
+
+  h2{
+    font-size:13px; font-weight:680; letter-spacing:.13em; text-transform:uppercase;
+    margin:52px 0 6px; padding-bottom:9px; border-bottom:1px solid var(--rule);
+    display:flex; align-items:center; gap:10px;
+  }
+  .dot{width:9px; height:9px; border-radius:2px; flex:none}
+  .kicker{
+    font-size:16.5px; color:var(--ink-2); margin:14px 0 22px; max-width:62ch;
+  }
+  .kicker strong{color:var(--ink); font-weight:600}
+
+  .cards{display:grid; gap:14px}
+  @media(min-width:680px){ .cards.two{grid-template-columns:1fr 1fr} }
+  .card{
+    background:var(--card); border:1px solid var(--rule); border-radius:9px;
+    padding:18px 20px; box-shadow:var(--shadow);
+  }
+  .card .name{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:14.5px; font-weight:600; margin:0 0 7px; letter-spacing:-.01em;
+  }
+  .card p{margin:0; font-size:15.5px; line-height:1.58; color:var(--ink-2)}
+  .card p + p{margin-top:9px}
+  .card .sub{
+    font-family:ui-monospace,monospace; font-size:12.5px; color:var(--ink-3);
+    margin-top:11px; padding-top:10px; border-top:1px dashed var(--rule); line-height:1.85;
+  }
+  .card strong{color:var(--ink); font-weight:600}
+
+  .rule-box{
+    margin:26px 0; padding:18px 22px; border-radius:9px;
+    background:var(--card-2); border:1px solid var(--rule);
+    border-left:3px solid var(--motor);
+  }
+  .rule-box p{margin:0; font-size:16px; color:var(--ink-2)}
+  .rule-box p+p{margin-top:10px}
+  .rule-box strong{color:var(--ink); font-weight:600}
+
+  .partline{
+    margin:76px 0 0; padding-top:30px; border-top:2px solid var(--rule);
+  }
+  .partline .n{
+    font-family:system-ui,sans-serif; font-size:11.5px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+  }
+  .partline h2{
+    font-size:clamp(23px,3.6vw,30px); font-weight:740; letter-spacing:-.022em;
+    text-transform:none; margin:8px 0 0; padding:0; border:0; display:block;
+    line-height:1.16; text-wrap:balance;
+  }
+
+  .shift{display:grid; gap:0; margin:26px 0 8px}
+  .shift .row{
+    display:grid; grid-template-columns:1fr; gap:4px;
+    padding:17px 0; border-bottom:1px solid var(--rule);
+  }
+  @media(min-width:700px){
+    .shift .row{grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr); gap:14px; align-items:center}
+  }
+  .shift .was{color:var(--ink-3); font-size:15.5px}
+  .shift .arw{color:var(--ink-3); text-align:center; font-size:15px; line-height:1}
+  .shift .now{color:var(--ink); font-size:16px; font-weight:600}
+  @media(max-width:699px){
+    .shift .was{text-decoration:line-through; text-decoration-color:var(--rule)}
+    .shift .arw{display:none}
+  }
+
+  table.rooms{
+    width:100%; border-collapse:collapse; margin:22px 0 6px;
+    font-family:system-ui,sans-serif; font-size:15px;
+  }
+  table.rooms th,table.rooms td{
+    text-align:left; padding:12px 14px 12px 0; border-bottom:1px solid var(--rule);
+    vertical-align:top;
+  }
+  table.rooms th{
+    font-size:11.5px; letter-spacing:.11em; text-transform:uppercase;
+    color:var(--ink-3); font-weight:650;
+  }
+  table.rooms td:first-child{font-weight:600; color:var(--ink); white-space:nowrap}
+  table.rooms td{color:var(--ink-2)}
+  .tablewrap{overflow-x:auto}
+
+  .warn{border-left-color:var(--oper)}
+  .closing{
+    margin-top:60px; padding-top:26px; border-top:1px solid var(--rule);
+    font-size:16px; color:var(--ink-2);
+  }
+  .closing strong{color:var(--ink); font-weight:600}
+
+</style>
+<div class="wrap">
+<header>
+  <p class="eyebrow">Tu sistema · el mapa</p>
+  <h1>Tres carpetas, una sola regla</h1>
+  <p class="lede">No hace falta que entiendas cómo funciona por dentro. Solo dónde va
+  cada cosa — y eso cabe en tres nombres.</p>
+</header>
+
+<section class="figure">
+<svg viewBox="0 0 720 300" role="img" aria-label="Diagrama: tres carpetas en fila. exos es el sistema y no se toca; modulos son los programas que añades; mi-vida es tuya. Una flecha muestra que exos se puede reemplazar entero sin tocar las otras dos.">
+  <rect x="30" y="40" width="190" height="150" rx="14" fill="var(--motor-bg)" stroke="var(--motor)" stroke-width="1.5"/>
+  <text x="125" y="78" text-anchor="middle" fill="var(--motor)" font-weight="700" font-size="17">exos/</text>
+  <text x="125" y="104" text-anchor="middle" fill="var(--ink-2)" font-size="12.5">el sistema</text>
+  <text x="125" y="132" text-anchor="middle" fill="var(--ink-3)" font-size="11.5">no lo editas</text>
+  <text x="125" y="152" text-anchor="middle" fill="var(--ink-3)" font-size="11.5">se reemplaza entero</text>
+
+  <rect x="265" y="40" width="190" height="150" rx="14" fill="var(--oper-bg)" stroke="var(--oper)" stroke-width="1.5"/>
+  <text x="360" y="78" text-anchor="middle" fill="var(--oper)" font-weight="700" font-size="17">modulos/</text>
+  <text x="360" y="104" text-anchor="middle" fill="var(--ink-2)" font-size="12.5">los programas</text>
+  <text x="360" y="132" text-anchor="middle" fill="var(--ink-3)" font-size="11.5">vacío al principio</text>
+  <text x="360" y="152" text-anchor="middle" fill="var(--ink-3)" font-size="11.5">añades o quitas carpetas</text>
+
+  <rect x="500" y="40" width="190" height="150" rx="14" fill="var(--terr-bg)" stroke="var(--terr)" stroke-width="1.5"/>
+  <text x="595" y="78" text-anchor="middle" fill="var(--terr)" font-weight="700" font-size="17">mi-vida/</text>
+  <text x="595" y="104" text-anchor="middle" fill="var(--ink-2)" font-size="12.5">lo tuyo</text>
+  <text x="595" y="132" text-anchor="middle" fill="var(--ink-3)" font-size="11.5">aquí escribes tú</text>
+  <text x="595" y="152" text-anchor="middle" fill="var(--ink-3)" font-size="11.5">y aquí se queda</text>
+
+  <path d="M125 210 Q125 245 360 245" fill="none" stroke="var(--motor)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <text x="360" y="272" text-anchor="middle" fill="var(--ink-2)" font-size="12.5">
+    Puedes borrar <tspan fill="var(--motor)" font-weight="600">exos/</tspan> y volver a ponerla: no pierdes nada tuyo
+  </text>
+</svg>
+</section>
+
+<section>
+<h2><span class="dot" style="background:var(--motor)"></span>El sistema</h2>
+<div class="cards">
+  <article class="card">
+    <p class="name">exos/</p>
+    <p>Lo que hace que tu agente sea continuo, competente y seguro: las reglas que lee
+    antes de actuar, los guardianes que impiden que rompa lo que funciona, y la forma de
+    guardar secretos fuera de los archivos.</p>
+    <p class="note"><strong>No lo edites.</strong> Actualizar es reemplazar esta carpeta
+    entera — y por eso el agente tiene prohibido escribir dentro.</p>
+  </article>
+</div>
+</section>
+
+<section>
+<h2><span class="dot" style="background:var(--oper)"></span>Los programas</h2>
+<div class="cards">
+  <article class="card">
+    <p class="name">modulos/</p>
+    <p>Empieza vacía. Aquí aterriza cada programa que amplía lo que tu sistema sabe hacer,
+    en su propia carpeta con sus reglas.</p>
+    <p class="note">Si nunca añades ninguno, tu sistema funciona igual.</p>
+  </article>
+</div>
+</section>
+
+<section>
+<h2><span class="dot" style="background:var(--terr)"></span>Lo tuyo</h2>
+<div class="cards">
+  <article class="card">
+    <p class="name">mi-vida/</p>
+    <p>Tu trabajo: lo que tienes entre manos, lo que decides, lo que vas dejando escrito.
+    Es la carpeta que crece contigo.</p>
+    <p class="note">Sobrevive a cualquier actualización. Nada de aquí viaja en
+    <code>exos/</code>, y por eso reemplazarla no te borra nada.</p>
+  </article>
+</div>
+</section>
+
+<section class="closing">
+  <h2>La única regla que hay que recordar</h2>
+  <p>Si es del sistema, va en <code>exos/</code> y no lo tocas. Si es tuyo, va en
+  <code>mi-vida/</code>. Si es un programa que añadiste, va en <code>modulos/</code>.</p>
+  <p class="note">¿Dudas de dónde poner algo? Pregúntaselo a tu agente: conoce esta regla
+  y va a colocarlo por ti.</p>
+</section>
+</div>

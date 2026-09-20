@@ -1,0 +1,41 @@
+---
+tipo: documento
+estado: borrador
+fecha: 2026-08-02
+---
+
+# PLANTILLA de manifiesto de agente (context pack ~200 tokens).
+# Un AGENTE.yaml por dominio en modulos/<programa>/. El orquestador
+# (el orquestador manager u otro) lanza cada agente entregándole SOLO esto.
+# Fuente de verdad de las fronteras: exos/agentes/FRONTERAS — Dominios de agentes.md
+# Este manifiesto la PROYECTA en formato máquina; si divergen, gana FRONTERAS y se corrige aquí.
+
+agente: nombre-corto
+dominio: negocio | media | biblioteca | codigo
+mision: una frase — qué optimiza y qué pregunta responde
+voz:                          # requerido — verdades de conducta
+  - "Sé genuinamente útil; cero adulación."   # + 3 compartidas + específicas del dominio
+estado: operativo | parcial | por-construir
+
+contexto_arranque:        # qué lee al despertar, EN ORDEN (barato → específico)
+  - mi-vida/hot.md
+  # Descomentar al crear el agente, sustituyendo <Dominio> por el real. Van
+  # comentadas porque el guardián de contratos comprueba que toda ruta declarada
+  # EXISTE, y un marcador de plantilla nunca existe: dejarlas activas rompe el
+  # check en cuanto alguien toca este archivo (pasó en la PR #6, 04-sep-2026).
+  # - exos/generados/_index-<Dominio>.md
+  # - modulos/<programa>/MODULO.yaml
+
+lee: []                   # carpetas/archivos con acceso de lectura
+escribe: []               # ÚNICOS lugares donde puede crear/modificar
+prohibido:                # ni leer contexto sensible ni escribir jamás
+  - "Dependencias Externas: Prohibido resolver con librerías o dependencias de terceros (ej. Puppeteer) lo que se pueda lograr con capacidades nativas (CSS, HTML, navegador) a coste cero (Zero-Trust Protocol)."
+
+produce: []               # artefactos de salida (contratos)
+consume: []               # artefactos de entrada (de otros agentes)
+entrega_a: []             # agente/humano que recibe cada artefacto
+
+skills: []                # las de exos/agentes/INDICE-agentes.md que puede invocar
+escalado: >
+  Cuándo debe parar y pedir al humano (decisiones de doctrina, dinero,
+  publicación, borrado). Por defecto: proponer, nunca aplicar.

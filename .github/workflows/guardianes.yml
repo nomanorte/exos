@@ -1,0 +1,122 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# LOS GUARDIANES, EJECUTÁNDOSE EN EL SERVIDOR
+#
+# POR QUÉ EXISTE ESTE ARCHIVO
+#
+# Los guardianes de este sistema viven en `exos/githooks/`, y git solo los usa si
+# alguien ejecutó `git config core.hooksPath exos/githooks` en esa copia concreta.
+# Esa configuración es LOCAL: vive en `.git/config`, no se versiona y NO viaja en
+# un `git clone`.
+#
+# Consecuencia: cada copia nueva del proyecto —otro ordenador, o una sesión de un
+# agente en la nube— llega SIN guardianes. Y no falla nada: sencillamente no
+# existen. Un guardián ausente no se queja, y ése es el peor modo de fallo que hay.
+#
+# Esto lo cubre desde el otro lado. Se ejecuta en GitHub, en cada cambio, venga de
+# donde venga: de tu portátil, de tu móvil, de un agente o de otra persona. No se
+# ejecuta en el ordenador de nadie, así que no se puede olvidar ni saltar con
+# `--no-verify`.
+#
+# `bootstrap.sh` cubre la otra mitad: avisa en un segundo, antes de commitear.
+# Las dos hacen falta y no sobra ninguna.
+#
+# ⚠️ QUÉ NO CORRE AQUÍ, Y POR QUÉ. `watchdog_hot.py` se queda fuera a propósito:
+# compara fechas de modificación de archivos para saber si hay trabajo sin
+# registrar, y en una copia recién descargada TODOS los archivos tienen la misma
+# fecha. Aquí daría un resultado inventado. Su sitio es el gancho local, donde las
+# fechas significan algo.
+# ══════════════════════════════════════════════════════════════════════════════
+
+name: Guardianes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cada cambio dispara una ejecución. Si llegan varias seguidas sobre lo mismo,
+# solo importa la última: las anteriores se cancelan. En un plan gratuito los
+# minutos son finitos y esto los estira.
+concurrency:
+  group: guardianes-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  guardianes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # los guardianes comparan contra el estado anterior
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Lo único que hace falta instalar
+        run: pip install --quiet pyyaml
+
+      - name: Con qué se compara
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # El ancestro común real, no el punto de fork. Si se usa la base
+            # congelada, los cambios que otra rama integre después se le
+            # atribuyen a ésta — y el guardián acusa de cosas que nadie tocó.
+            # Un candado que grita en falso enseña a ignorarlo.
+            base="$(git merge-base "origin/${{ github.event.pull_request.base.ref }}" HEAD)"
+          else
+            base="${{ github.event.before }}"
+            git rev-parse --verify -q "${base}^{commit}" >/dev/null || base="$(git rev-parse HEAD^ 2>/dev/null || echo '')"
+          fi
+          echo "ref=$base" >> "$GITHUB_OUTPUT"
+
+      # ── El desbloqueo consciente de la doctrina ────────────────────────────
+      # Los archivos de `exos/CONGELADO.md` son las reglas del sistema:
+      # cambiarlos cambia el comportamiento de todos los agentes a la vez. Por eso
+      # no se cambian de pasada.
+      #
+      # Aquí se desbloquea igual que en local, pero dejando rastro: el cambio pasa
+      # si en el mismo rango hay una decisión escrita en `mi-vida/decisions/`. No
+      # es una barrera contra alguien malicioso —nunca lo fue—: es una barrera
+      # contra un agente despistado, que le obliga a parar y escribir por qué.
+      - name: ¿Viene con decisión escrita?
+        id: doctrina
+        env:
+          BASE_REF: ${{ steps.base.outputs.ref }}
+        run: |
+          unlock=0
+          if [ -n "$BASE_REF" ] && git -c core.quotepath=false diff --name-only "$BASE_REF...HEAD" \
+              | grep -q '^mi-vida/decisions/.*\.md$'; then
+            unlock=1
+            echo "🔓 El cambio trae su decisión registrada: la doctrina se desbloquea."
+          fi
+          echo "unlock=$unlock" >> "$GITHUB_OUTPUT"
+
+      - name: Archivos que no deberían versionarse
+        env:
+          BASE_REF: ${{ steps.base.outputs.ref }}
+        run: |
+          if [ -n "$BASE_REF" ]; then
+            python3 exos/scripts/guardian_archivos.py --staged --desde "$BASE_REF"
+          else
+            echo "Sin estado anterior con el que comparar: nada que revisar."
+          fi
+
+      - name: Doctrina y frases prohibidas
+        env:
+          UNLOCK: ${{ steps.doctrina.outputs.unlock }}
+          BASE_REF: ${{ steps.base.outputs.ref }}
+        run: |
+          if [ -n "$BASE_REF" ]; then
+            python3 exos/scripts/guardian_doctrina.py --staged --desde "$BASE_REF"
+          else
+            echo "Sin estado anterior con el que comparar: nada que revisar."
+          fi
+
+      - name: El estado del sistema es válido
+        run: python3 exos/scripts/validar_vault.py --breve

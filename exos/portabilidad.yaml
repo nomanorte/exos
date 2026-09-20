@@ -1,0 +1,48 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# PORTABILIDAD — tu juicio sobre lo que instalas dentro de un programa
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# QUÉ ES. Cada skill o plugin que instalas DENTRO de una herramienta (tu editor, tu
+# agente) es una capacidad que las demás no ven. Aquí decides, una por una, si te
+# empodera de verdad o es ruido.
+#
+# ⚠️ VACÍO A PROPÓSITO. Hasta que escribas aquí, el parte te las señalará todas como
+# «sin juicio» — y eso es lo correcto: son preguntas que nadie ha contestado todavía.
+#
+# LA REGLA QUE LO GOBIERNA. Tu sistema promete que puedes cambiar de herramienta y
+# encontrarte lo mismo. Lo que vive dentro de un programa rompe esa promesa en silencio.
+# Así que: **cualquier cosa valiosa que instales debería tener su extracción escrita** —
+# qué haces el día que abras tu carpeta con otra herramienta y no esté.
+#
+# CÓMO SE RELLENA. Por cada skill, dos campos:
+#
+#   veredicto: potente | ruido
+#     · potente — te empodera de verdad. **Exige el campo `extraccion`.**
+#     · ruido   — inservible, desfasada o nunca usada. Candidata a desinstalar.
+#     · (sin entrada = sin juicio, y sigue saliendo en el parte)
+#
+#   extraccion: UNA frase — qué haces cuando esa capacidad no está.
+#     ⛔ NO es copiar la skill a tu cerebro. Una copia se desfasa de su original sin que
+#        nadie lo note, y acabas con dos versiones distintas del mismo nombre.
+#     ✅ Sí es: la alternativa portable, o dónde conseguirla, o «reescribirla como propia»
+#        si resulta ser esencial de verdad.
+#
+# ⚠️ Y no lo rellenes de memoria: mira primero si la has usado alguna vez. Una skill que
+# nunca aparece en tus sesiones no es potente por muy bien que suene su descripción.
+#
+# El parte:  python3 exos/scripts/auditar_portabilidad.py
+# ══════════════════════════════════════════════════════════════════════════════
+
+version: 1
+actualizado: ''
+
+skills:
+  # ── EJEMPLOS, para que veas la forma. Bórralos y escribe los tuyos ───────────
+  #
+  # lector-de-webs:
+  #   veredicto: potente
+  #   extraccion: "sin ella: descargar la página y pedir al agente que ignore menús y anuncios"
+  #
+  # asistente-de-plantillas:
+  #   veredicto: ruido
+  #   nota: "vino con el programa, nunca la he usado"

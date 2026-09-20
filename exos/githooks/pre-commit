@@ -1,0 +1,82 @@
+#!/bin/bash
+# Guardián — checks & balances. Bloquea el commit si el estado del cerebro es inválido.
+#
+# POR QUÉ EXISTE. Una regla que solo vive escrita en un documento se incumple sin que
+# nadie se entere. Este gancho convierte las reglas en comprobaciones: se ejecutan solas,
+# en el acto y gratis, justo antes de que algo entre al historial.
+#
+# Vive en `exos/githooks/` y no en `.git/hooks/` a propósito: lo de dentro de `.git` no se
+# versiona y se pierde al clonar. Para activarlo:
+#
+#     git config core.hooksPath exos/githooks
+#
+# Si necesitas commitear igualmente (raro, y déjalo dicho en el mensaje):
+#
+#     git commit --no-verify
+#
+# ⚠️ Este es el gancho de ARRANQUE: llama a los tres guardianes que vienen con el sistema.
+# Cuando añadas comprobaciones propias, añádelas aquí y hazlas fallar con `exit 1`. La
+# regla que sostiene esto: **un guardián que se queja de algo que no existe es la forma
+# más rápida de enseñar a saltarse los guardianes.** Si una comprobación depende de un
+# archivo opcional, envuélvela en un `if [ -f ... ]`.
+
+# ── 06-sep-2026 · En `main` no se trabaja ────────────────────────────────────
+# Faltaba, y el fallo era silencioso del peor modo: el commit pasaba aquí, subía a
+# `main`, y el centinela del servidor lo revertía treinta segundos después. La persona
+# veía su trabajo deshecho por algo invisible, sin haber hecho nada mal.
+#
+# Bloquear aquí cuesta un aviso y lo explica en el momento. La otra mitad —el gancho
+# de la web— ya lo hacía; esto iguala las dos.
+#
+# Solo aplica si el proyecto está en git con ramas. Si alguien trabaja en local sin
+# más, `main` es su única rama y esto le estorbaría: por eso la salida por PUBLICAR.
+RAMA=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
+if [ "$RAMA" = "main" ] && [ "${PUBLICAR:-}" != "1" ]; then
+    echo ""
+    echo "⛔ COMMIT BLOQUEADO — estás en main, y en main no se trabaja."
+    echo ""
+    echo "   Tu trabajo NO se pierde. Llévatelo a una rama sin soltar nada:"
+    echo ""
+    echo "     git switch -c cambio/lo-que-estes-haciendo"
+    echo "     git commit ..."
+    echo ""
+    echo "   Si no sabes qué hacer con esto, díselo a tu agente tal cual."
+    echo ""
+    echo "   (excepción consciente, déjala dicha:  PUBLICAR=1 git commit ...)"
+    echo ""
+    exit 1
+fi
+
+echo "→ Guardián: archivos que no deberían versionarse..."
+if ! python3 exos/scripts/guardian_archivos.py --staged; then
+    exit 1
+fi
+
+echo "→ Guardián: doctrina y frases prohibidas..."
+if ! python3 exos/scripts/guardian_doctrina.py --staged; then
+    exit 1
+fi
+
+echo "→ Guardián: el trabajo reciente está registrado..."
+if ! python3 exos/scripts/watchdog_hot.py; then
+    echo ""
+    echo "⛔ COMMIT BLOQUEADO — hay trabajo sin registrar."
+    echo "   Apunta en hot.md o en mi-vida/sesiones/ qué se hizo, y vuelve a intentarlo."
+    exit 1
+fi
+
+echo "→ Guardián: validando el estado del cerebro..."
+if ! python3 exos/scripts/validar_vault.py --breve; then
+    echo ""
+    echo "⛔ COMMIT BLOQUEADO — el estado del cerebro es inválido."
+    echo "   Esto rompería la trazabilidad, y acabarías encontrándolo a mano."
+    echo "   Arréglalo antes de commitear."
+    echo "   (si de verdad hace falta: git commit --no-verify)"
+    exit 1
+fi
+
+# Marca para el post-commit, que es quien deja rastro de los saltos. `git rev-parse
+# --git-path` funciona tanto en el checkout principal (`.git` es carpeta) como en un
+# worktree (`.git` es archivo).
+MARCA=$(git rev-parse --git-path _guardian_paso)
+if [ "${UNLOCK:-}" = "1" ]; then echo "unlock" > "$MARCA"; else echo "ok" > "$MARCA"; fi

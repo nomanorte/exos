@@ -1,0 +1,15 @@
+{
+  "generado": "2026-09-20",
+  "commit_origen": "e5254a24",
+  "sha256_catalogo": "9138156ce3eadd44d4fb5d216db028740180010e50c87e447c2a3dc7a4caaf4f",
+  "commits_fuente": {
+    "vault": "e5254a24"
+  },
+  "sha256_manifiesto": "17c5c9bfcf61258aa96e45e5e3f31cc7adc4f66c89fce0fed86bbbe21ffc8b8b",
+  "rutas_revisadas": 64,
+  "archivos": 64,
+  "sustituciones": 383,
+  "arranque_inyectado_en": 2,
+  "pendiente_de_vaciado_manual": 0,
+  "aviso": "Generado. No se edita a mano: se corrige el manifiesto y se regenera."
+}

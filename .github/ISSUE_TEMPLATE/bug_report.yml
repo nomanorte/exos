@@ -1,0 +1,29 @@
+name: Error
+description: Informa de un fallo reproducible sin incluir información personal.
+body:
+  - type: markdown
+    attributes:
+      value: "No publiques claves ni datos personales. Para vulnerabilidades, usa el canal privado de SECURITY.md."
+  - type: input
+    id: version
+    attributes:
+      label: Versión de EXOS
+      description: Tag instalado, si lo conoces.
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qué ocurre
+    validations:
+      required: true
+  - type: textarea
+    id: reproducir
+    attributes:
+      label: Pasos para reproducir con datos ficticios
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Qué esperabas
+    validations:
+      required: true

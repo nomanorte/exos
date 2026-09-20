@@ -1,0 +1,188 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# EL CENTINELA — la red que hace que nada se rompa del todo
+#
+# POR QUÉ EXISTE
+#
+# GitHub no deja proteger la rama `main` en un repositorio privado del plan
+# gratuito. Este workflow es SOLO para copias personales: nunca se ejecuta en
+# nomanorte/exos ni en nomanorte/exos-staging. Sin protección, los guardianes **avisan pero no
+# impiden**: cualquiera —o cualquier agente— puede escribir directamente en `main`
+# y saltarse la revisión entera. El semáforo se pone rojo y el coche ya ha pasado.
+#
+# Esto es la versión casera de esa protección. No puede impedir el cambio, pero
+# puede **deshacerlo** unos segundos después. El efecto práctico es el mismo
+# —`main` no se queda rota— y no cuesta dinero.
+#
+# QUÉ HACE, EN ESTE ORDEN:
+#   1. Ejecuta los guardianes sobre el nuevo estado de `main`.
+#   2. Si pasan, no hace absolutamente nada.
+#   3. Si fallan: PRIMERO guarda el trabajo en una rama `rescatado/<código>` —no
+#      se pierde NADA, nunca—, después devuelve `main` al último estado bueno, y
+#      abre un aviso contando qué falló y dónde está lo rescatado.
+#
+# NUNCA deshace nada si:
+#   · no hay un estado anterior fiable (rama recién creada o historia reescrita);
+#   · el cambio trae su decisión escrita en `mi-vida/decisions/` — ése es el gesto
+#     de cambiar las reglas a conciencia;
+#   · algún mensaje del cambio dice «[centinela: no deshacer]».
+# ══════════════════════════════════════════════════════════════════════════════
+
+name: Centinela de main
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: centinela-main
+  cancel-in-progress: false
+
+jobs:
+  centinela:
+    if: github.repository != 'nomanorte/exos' && github.repository != 'nomanorte/exos-staging'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install --quiet pyyaml
+
+      - name: ¿Hay un estado anterior al que volver?
+        id: previo
+        env:
+          ANTES: ${{ github.event.before }}
+          FORZADO: ${{ github.event.forced }}
+        run: |
+          if [ "$ANTES" = "0000000000000000000000000000000000000000" ] \
+            || [ "$FORZADO" = "true" ] \
+            || ! git rev-parse --verify -q "${ANTES}^{commit}" >/dev/null; then
+            echo "reversible=no" >> "$GITHUB_OUTPUT"
+            echo "base=" >> "$GITHUB_OUTPUT"
+            echo "→ Sin estado anterior fiable: se comprueba, pero no se deshará nada."
+          else
+            echo "reversible=si" >> "$GITHUB_OUTPUT"
+            echo "base=$ANTES" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: ¿El cambio trae su decisión escrita?
+        id: unlock
+        env:
+          BASE: ${{ steps.previo.outputs.base }}
+        run: |
+          unlock=0
+          if [ -n "$BASE" ] && git -c core.quotepath=false diff --name-only "$BASE..HEAD" \
+              | grep -q '^mi-vida/decisions/.*\.md$'; then
+            unlock=1
+            echo "→ Cambio de reglas con su decisión registrada: no se toca."
+          fi
+          echo "unlock=$unlock" >> "$GITHUB_OUTPUT"
+
+      - name: ¿Alguien pidió expresamente no deshacerlo?
+        id: exencion
+        env:
+          BASE: ${{ steps.previo.outputs.base }}
+        run: |
+          exento=0
+          if [ -n "$BASE" ] && git log --format=%B "$BASE..HEAD" \
+              | grep -qF '[centinela: no deshacer]'; then
+            exento=1
+          fi
+          echo "exento=$exento" >> "$GITHUB_OUTPUT"
+
+      - name: Los guardianes, sobre el nuevo main
+        id: guardianes
+        continue-on-error: true
+        env:
+          UNLOCK: ${{ steps.unlock.outputs.unlock }}
+          BASE_REF: ${{ steps.previo.outputs.base }}
+        run: |
+          set -o pipefail
+          { echo "### Qué se comprobó"; echo '```'; } > informe.txt
+
+          fallo=0
+          ejecutar() {
+            echo "── $1" >> informe.txt; shift
+            if ! "$@" >> informe.txt 2>&1; then fallo=1; echo "   ^ FALLÓ" >> informe.txt; fi
+          }
+
+          ejecutar "estado del sistema" python3 exos/scripts/validar_vault.py --breve
+          if [ -n "$BASE_REF" ]; then
+            ejecutar "archivos peligrosos" python3 exos/scripts/guardian_archivos.py --staged --desde "$BASE_REF"
+            ejecutar "doctrina" python3 exos/scripts/guardian_doctrina.py --staged --desde "$BASE_REF"
+          fi
+
+          echo '```' >> informe.txt
+          cat informe.txt
+          echo "fallo=$fallo" >> "$GITHUB_OUTPUT"
+          [ "$fallo" = "0" ]
+
+      - name: Rescatar y deshacer
+        if: steps.guardianes.outputs.fallo == '1' && steps.previo.outputs.reversible == 'si' && steps.unlock.outputs.unlock == '0' && steps.exencion.outputs.exento == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ steps.previo.outputs.base }}
+          MALO: ${{ github.sha }}
+        run: |
+          corto="${MALO:0:8}"
+          rama="rescatado/${corto}"
+
+          # PRIMERO se rescata. Pase lo que pase después, el trabajo está a salvo.
+          git push origin "${MALO}:refs/heads/${rama}"
+          echo "✅ Trabajo rescatado en la rama ${rama}"
+
+          git push --force-with-lease="refs/heads/main:${MALO}" origin "${BASE}:refs/heads/main"
+          echo "↩️  main devuelta a ${BASE}"
+
+          {
+            echo "## No te has quedado sin nada. Léelo entero, son treinta segundos."
+            echo ""
+            echo "Un cambio ha entrado en \`main\` sin pasar las comprobaciones, así que"
+            echo "**he devuelto \`main\` a como estaba** hace un momento."
+            echo ""
+            echo "**Tu trabajo está intacto.** Está guardado entero en la rama"
+            echo "\`${rama}\`. No se ha borrado nada y no se puede perder."
+            echo ""
+            echo "### Qué hacer"
+            echo ""
+            echo "Nada por tu cuenta. Díselo a tu agente con estas palabras:"
+            echo ""
+            echo "> el centinela ha deshecho un cambio en main, está en la rama ${rama}, arréglalo y ábreme una propuesta"
+            echo ""
+            echo "Él sabe qué hacer con eso."
+            echo ""
+            echo "### Qué falló exactamente"
+            echo ""
+            cat informe.txt
+          } > cuerpo.md
+
+          gh issue create --title "El centinela ha deshecho un cambio en main (${corto})" --body-file cuerpo.md
+
+      - name: Avisar sin deshacer
+        if: steps.guardianes.outputs.fallo == '1' && (steps.previo.outputs.reversible != 'si' || steps.unlock.outputs.unlock == '1' || steps.exencion.outputs.exento == '1')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MALO: ${{ github.sha }}
+        run: |
+          {
+            echo "Las comprobaciones fallan sobre \`${MALO:0:8}\` en \`main\`, pero **no he deshecho nada**:"
+            echo "o no había un estado anterior fiable, o el cambio traía su decisión escrita, o pedía"
+            echo "expresamente no deshacerse."
+            echo ""
+            echo "Díselo a tu agente y que lo mire. Debajo está lo que falló."
+            echo ""
+            cat informe.txt
+          } > cuerpo.md
+          gh issue create --title "Comprobaciones en rojo en main (${MALO:0:8})" --body-file cuerpo.md
+
+      - name: Cerrar en rojo si algo falló
+        if: steps.guardianes.outputs.fallo == '1'
+        run: exit 1

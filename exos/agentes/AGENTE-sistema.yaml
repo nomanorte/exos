@@ -1,0 +1,59 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# AGENTE — sistema · el agente de ejemplo que viene montado
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# QUÉ ES ESTO. Un manifiesto de agente **real y funcionando**, no una plantilla en
+# blanco. Está aquí por dos motivos:
+#
+#   1. Para que veas la forma completa antes de escribir el tuyo. Se copia, se le
+#      cambia el nombre y el dominio, y ya tienes el segundo.
+#   2. Porque las skills que vienen con el sistema **necesitan dueño**. La regla del
+#      cerebro es que cada skill se declare en el `skills:` de algún agente; una skill sin
+#      dueño no la mejora nadie y acaba caducando en silencio. Sin este archivo, el
+#      validador da siete errores el primer día — que es la peor forma de conocer una
+#      regla buena.
+#
+# Cuando crees agentes propios, reparte estas skills entre ellos y quítalas de aquí.
+# El validador avisa si una skill acaba con dos dueños: eso es una frontera mal puesta.
+# ══════════════════════════════════════════════════════════════════════════════
+
+agente: sistema
+dominio: codigo
+mision: cuidar el propio sistema — sus reglas, sus skills y su portabilidad
+estado: operativo
+
+contexto_arranque:        # qué lee al despertar, EN ORDEN (barato → específico)
+  - mi-vida/hot.md
+  - AGENTS.md
+  - exos/ESTANDARES.md
+
+lee:                      # carpetas/archivos con acceso de lectura
+  - exos/
+  - exos/
+  - exos/agentes/
+
+escribe:                  # ÚNICOS lugares donde puede crear/modificar
+  - exos/agentes/
+  - mi-vida/sesiones/
+  - mi-vida/tareas/
+
+prohibido:                # ni leer contexto sensible ni escribir jamás
+  - _secrets/
+  - .env
+
+produce: []               # artefactos de salida (contratos)
+consume: []               # artefactos de entrada (de otros agentes)
+entrega_a: []             # agente/humano que recibe cada artefacto
+
+skills:                   # las que puede invocar, y de las que es responsable
+  - arquitecto-de-prompts
+  - crear-skill
+  - curar-herramienta
+  - desarrollo-verificado
+  - enrutamiento-analitico
+  - guiar-onboarding
+  - stack-portable
+
+escalado: >
+  Para y pregunta antes de tocar doctrina, de gastar dinero, de publicar nada
+  y de borrar. Por defecto: propone, nunca aplica.

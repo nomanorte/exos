@@ -1,0 +1,30 @@
+#!/bin/bash
+# post-commit — deja rastro de cada salto del guardián.
+#
+# POR QUÉ. Un candado que todo el mundo se salta es PEOR que ninguno, porque da falsa
+# sensación de seguridad. El atajo tiene que seguir existiendo —hay veces que está
+# justificado— pero nunca puede ser invisible.
+#
+# Cómo se detecta: el pre-commit deja una marca al terminar. Si el commit se hizo con
+# --no-verify, el pre-commit no corrió y la marca no está. Entonces se anota.
+
+MARCA=$(git rev-parse --git-path _guardian_paso)
+LOG="exos/logs/saltos-guardian.log"
+mkdir -p "$(dirname "$LOG")"
+
+SHA=$(git rev-parse --short HEAD 2>/dev/null)
+ASUNTO=$(git log -1 --pretty=%s 2>/dev/null)
+CUANDO=$(date "+%Y-%m-%d %H:%M")
+
+if [ ! -f "$MARCA" ]; then
+    echo "$CUANDO | --no-verify | $SHA | $ASUNTO" >> "$LOG"
+    echo "📝 Anotado: este commit se hizo saltándose el guardián (--no-verify)."
+    echo "   Queda en $LOG y sale en el arranque de la próxima sesión."
+elif [ "$(cat "$MARCA" 2>/dev/null)" = "unlock" ]; then
+    echo "$CUANDO | UNLOCK=1   | $SHA | $ASUNTO" >> "$LOG"
+    echo "📝 Anotado: desbloqueo consciente de zona congelada."
+fi
+
+rm -f "$MARCA"
+
+exit 0
