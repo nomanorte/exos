@@ -1,0 +1,41 @@
+name: Mi primera instalación
+description: Cuéntanos cómo te fue instalando y usando EXOS por primera vez.
+title: "Primera instalación: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por probarlo. Lo que más nos sirve es saber **dónde te atascaste**, aunque
+        fuera por algo que te parezca obvio. No incluyas datos personales ni claves.
+  - type: input
+    id: agente
+    attributes:
+      label: Con qué agente lo usaste
+      placeholder: Claude Code, Codex, otro…
+    validations:
+      required: true
+  - type: textarea
+    id: atasco
+    attributes:
+      label: Dónde te atascaste o qué no entendiste
+      description: Un paso, una frase de la documentación, un mensaje del agente…
+    validations:
+      required: true
+  - type: textarea
+    id: bien
+    attributes:
+      label: Qué funcionó bien
+    validations:
+      required: false
+  - type: dropdown
+    id: llegaste
+    attributes:
+      label: Hasta dónde llegaste
+      options:
+        - No pude instalarlo
+        - Instalé, pero el recorrido no arrancó
+        - Terminé el recorrido guiado
+        - Lo uso a diario
+    validations:
+      required: true

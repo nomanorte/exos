@@ -223,6 +223,11 @@ def anadir(task_id: str, paso: str) -> int:
     p = cands[0]
     texto = p.read_text(encoding="utf-8")
 
+    # Un reintento no debe crear otra casilla ni reabrir una ya completada.
+    if re.search(r"(?m)^- \[[ xX]\] " + re.escape(paso) + r"$", texto):
+        print(f"↩️ Checkpoint ya presente en {task_id}: {paso}")
+        return 0
+
     linea = f"- [ ] {paso}"
     if "## Pasos" in texto:
         texto = re.sub(r"(## Pasos\n)", rf"\1{linea}\n", texto, count=1)

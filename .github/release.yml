@@ -1,0 +1,19 @@
+# Notas de release generadas y agrupadas por tipo de cambio. Quien contribuye aparece
+# mencionado en la release donde entra su cambio (ver CONTRIBUTING.md).
+changelog:
+  exclude:
+    labels:
+      - invalid
+      - duplicate
+      - wontfix
+  categories:
+    - title: "Novedades"
+      labels: [enhancement]
+    - title: "Errores corregidos"
+      labels: [bug]
+    - title: "Documentación"
+      labels: [documentation]
+    - title: "Accesibilidad"
+      labels: [accessibility]
+    - title: "Otros cambios"
+      labels: ["*"]
