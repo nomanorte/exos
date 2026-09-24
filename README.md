@@ -144,6 +144,14 @@ siempre:
 
 Si no puede escribirte las tres, es que no lo ha investigado. Pídeselas antes de decidir.
 
+## ¿Prefieres hacerlo acompañado?
+
+EXOS es gratis y es tuyo: puedes montarlo tú solo, sin pedirle nada a nadie. Si prefieres hacerlo
+con alguien al lado —tu caso, tus decisiones, en directo—, existe **Exodus**, el programa de
+[Noma Norte](https://nomanorte.com) para pasar de «algún día me iré» a un plan con fechas.
+La primera edición tiene [lista abierta](https://nomanorte.com/exodus): quien entra en ella
+habla antes con quien lo lleva.
+
 ## Licencia
 
 Apache 2.0. Ver [`LICENSE`](LICENSE).
@@ -151,7 +159,12 @@ Apache 2.0. Ver [`LICENSE`](LICENSE).
 ## Colaborar y avisar de problemas
 
 Las propuestas y los errores se reciben mediante [Issues](https://github.com/nomanorte/exos/issues) y Pull Requests.
-Lee [`CONTRIBUTING.md`](CONTRIBUTING.md) antes de enviar cambios. Para una vulnerabilidad
+Lee [`CONTRIBUTING.md`](CONTRIBUTING.md) antes de enviar cambios y
+[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) para saber cómo nos tratamos. Para una vulnerabilidad
 o una posible filtración, **no abras un Issue público**: sigue [`SECURITY.md`](SECURITY.md).
 `main` puede evolucionar entre versiones; una versión publicada se identifica por su tag
 y sus notas de release, no por el último commit.
+
+---
+
+Creado por [Noma Koe](https://nomakoe.com) · Apache 2.0

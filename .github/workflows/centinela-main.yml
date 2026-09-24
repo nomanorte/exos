@@ -5,7 +5,7 @@
 #
 # GitHub no deja proteger la rama `main` en un repositorio privado del plan
 # gratuito. Este workflow es SOLO para copias personales: nunca se ejecuta en
-# nomanorte/exos ni en nomanorte/exos-staging. Sin protección, los guardianes **avisan pero no
+# tu-segunda-marca/exos. Sin protección, los guardianes **avisan pero no
 # impiden**: cualquiera —o cualquier agente— puede escribir directamente en `main`
 # y saltarse la revisión entera. El semáforo se pone rojo y el coche ya ha pasado.
 #
@@ -43,7 +43,7 @@ concurrency:
 
 jobs:
   centinela:
-    if: github.repository != 'nomanorte/exos' && github.repository != 'nomanorte/exos-staging'
+    if: github.repository != 'tu-segunda-marca/exos'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

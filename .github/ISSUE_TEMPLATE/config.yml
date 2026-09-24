@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Vulnerabilidad o dato filtrado
+    url: https://github.com/nomanorte/exos/security/policy
+    about: No abras un Issue público. Sigue SECURITY.md.
+  - name: Ayuda para usar EXOS
+    url: https://github.com/nomanorte/exos/blob/main/SUPPORT.md
+    about: Cómo pedir ayuda y a dónde escribir.
