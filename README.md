@@ -1,3 +1,5 @@
+> **Este repositorio está archivado (10-oct-2026).** EXOS forma parte ahora de **Exodus**, de Noma Norte: [nomanorte.com/exodus](https://nomanorte.com/exodus). Lo publicado aquí sigue disponible para leer y copiar.
+
 # EXOS
 
 ### Tu sistema operativo personal para trabajar con agentes de IA — en tu carpeta, sin depender de nadie.
